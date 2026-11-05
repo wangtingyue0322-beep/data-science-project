@@ -1,144 +1,145 @@
-# Growth at the top, erosion at the bottom
+# A widening divide, with losses at the bottom
 
-**How the distribution of U.S. family income moved between 1972 and 2016**
+**A reproducible analysis of U.S. family income, 1972–2016**
 
-A reproducible analysis of 55,343 General Social Survey respondents asking whether American family
-incomes grew, stagnated, or spread apart over four decades — and how much of the change is
-accounted for by education.
+This project uses 55,343 General Social Survey (GSS) respondents to examine how the income
+distribution changed over four decades and how median trends differed by highest degree. It is a
+descriptive analysis: it does not claim that education caused the changes.
 
-![Income distribution, 1970s versus 2010s](figures/fig1_income_cdf_1970s_vs_2010s.png)
+![Income distribution, 1972–1979 versus 2010–2016](figures/fig1_income_cdf_1970s_vs_2010s.png)
 
----
+## Research question
 
-## The question
+Between 1972 and 2016, did U.S. family incomes grow, stagnate, or spread apart — and how did
+median income trends differ by highest degree?
 
-The headline U.S. income series is usually quoted as a single number, the median. A median says
-nothing about the shape of the distribution around it. If the bottom falls while the top is flat, a
-"stagnant median" is not the absence of change — it is a redistribution.
+A median alone cannot answer the first part. It summarises the centre of a distribution but not
+what happened below or above it, so this project compares several quantiles and dispersion measures.
 
-**Research question:** between 1972 and 2016, did U.S. family incomes grow, stagnate, or spread
-apart, and how much of the change is accounted for by education?
+## Data and scope
 
-## Data
-
-| | |
+| Item | Description |
 |---|---|
 | Source | General Social Survey (GSS), NORC at the University of Chicago |
-| Coverage | 31 survey waves, 1972–2016 |
-| Unit | one respondent per row, family income in constant dollars (`realinc`) |
-| Sample | 55,343 respondents with a valid income value and a valid degree level |
-| File in this repository | `data/gss_income.csv` (5 columns, 1.4 MB) |
-| Provenance and reuse terms | [`data/README.md`](data/README.md) |
+| Coverage | 31 survey waves, 1972–2016; income refers to the year before interview |
+| Unit | One respondent per row; the outcome is family income, not individual earnings |
+| Analytical sample | 55,343 respondents after the documented validity filters |
+| Variables | Survey year, schooling years, highest degree, real family income, person weight |
+| Income unit | Constant 1986 U.S. dollars (`realinc`), already deflated by the GSS |
+| Local data | `data/gss_income.csv` — five columns, approximately 1.4 MB |
+| Provenance | [`data/README.md`](data/README.md), including construction and reuse notes |
 
-The GSS is a public-use survey: the data are distributed free of charge by NORC for research and
-teaching, and redistributing this five-variable subset for reproducibility falls within those terms.
-The extract contains **no direct identifiers and no restricted variables** — only the survey year,
-years of schooling, degree level, deflated family income, and the survey weight. Full terms and the
-exact construction steps are in [`data/README.md`](data/README.md).
+The reduced public-use extract contains no direct identifiers or restricted variables. It is
+included for teaching and reproducibility; the underlying GSS data remain subject to NORC's terms.
 
-## Methods and tools
+## Method
 
-**Tools.** Python 3.13 with pandas, NumPy and Matplotlib. No modelling library is needed; every
-statistic is computed explicitly so the reader can audit the arithmetic.
+**Tools.** Python, pandas, NumPy and Matplotlib. The statistics are calculated explicitly in the
+notebook so that the arithmetic can be inspected.
 
-**Three methodological choices drive every number:**
+1. **Survey weights.** Descriptive statistics use `wtssall`. Weighted quantiles interpolate on
+   cumulative mid-weights rather than treating every row as equally likely.
+2. **Constant dollars.** `realinc` is expressed in constant 1986 dollars. No second deflation is
+   applied. Percentage changes compare the pooled periods 1972–1979 and 2010–2016.
+3. **Top-coding.** The open-ended upper income bracket is assigned a single value. Depending on the
+   period, 7.4–11.3% of sampled observations sit at their survey year's maximum. Headline tail
+   statistics therefore use the retained, non-top-coded sample. The reported p90 is the 90th
+   percentile **of that retained sample**, not an estimate of the full-population p90.
+4. **Sensitivity check.** The notebook also calculates Gini and log-income dispersion without
+   trimming. The upward direction remains, but the levels differ; neither specification reveals the
+   unobserved incomes inside the top bracket.
 
-1. **Survey weights.** GSS samples are not self-weighting, so all statistics use `wtssall` with a
-   weighted quantile that interpolates on cumulative mid-weights. Unweighted aggregates would
-   over-represent over-sampled groups.
-2. **Constant dollars.** `realinc` is already deflated by the GSS, so a 1972 dollar and a 2016
-   dollar are the same unit and no further adjustment is applied.
-3. **Trimming the top code.** The income question is bracketed and the open-ended top bracket is
-   assigned a single value, which absorbs 7–11% of respondents per period — enough that an
-   unadjusted 90th percentile lands *inside* the censored mass. All tail statistics (p90, Gini,
-   SD of log income) are therefore computed after dropping observations sitting on their survey
-   year's ceiling. Medians and lower quantiles use the full sample.
-
-**Measures.** Weighted quantiles (p10–p90), the p75/p25 ratio, the Gini coefficient from the
-weighted Lorenz curve, the standard deviation of log income, the share below 60% of the decade
-median, and median income by degree level.
+**Measures.** Weighted p10, p25, median, p75 and retained-sample p90; p75/p25; weighted Gini from
+the Lorenz curve; standard deviation of log income; share below 60% of the period median; and
+weighted median income by highest degree.
 
 ## Key findings
 
-![Quantiles by decade](figures/fig2_income_quantiles_by_decade.png)
+![Weighted income quantiles by period](figures/fig2_income_quantiles_by_decade.png)
 
-1. **The bottom lost ground.** The 10th percentile fell from about \$9,200 to \$6,700 in constant
-   dollars (−26.5%) and the 25th percentile fell 22.3%, while the median fell 11.5%.
-2. **The top held rather than gained.** The 90th percentile, measured after trimming the censored
-   top code, moved +1.2% over four decades.
-3. **The gap widened.** The p75/p25 ratio rose from 2.58 to 3.51, the Gini from 0.33 to 0.38, the
-   SD of log income from 0.77 to 1.00, and the share below 60% of the decade median from 25.5% to
-   31.2%.
-4. **Education separates the trends.** Median income fell 33.8% for respondents without a
-   high-school diploma, was roughly flat for high-school graduates (−21.4%), and rose for
-   bachelor's (+6.4%) and graduate (+12.3%) respondents. The bachelor's-to-high-school premium
-   widened from 1.34 to 1.82.
+1. **Lower incomes lost substantial ground.** Between 1972–1979 and 2010–2016, p10 fell from about
+   \$9,200 to \$6,700 (−26.5%), p25 fell 22.3%, and the median fell 11.5%, all in constant dollars.
+2. **The retained-sample upper quantile was nearly unchanged.** The non-top-coded p90 moved +1.2%.
+   This is not evidence about the highest earners, whose incomes are censored.
+3. **Dispersion increased.** The p75/p25 ratio rose from 2.58 to 3.51. In the retained sample, the
+   Gini rose from 0.33 to 0.38 and SD of log income from 0.77 to 1.00. The share below 60% of the
+   period median rose from 25.5% to 31.2%.
+4. **Education groups had different descriptive trends.** Median income fell 33.8% for respondents
+   without a high-school diploma and 21.4% for high-school graduates, but rose 6.4% for bachelor's
+   and 12.3% for graduate respondents. The bachelor's-to-high-school median ratio rose from 1.34 to
+   1.82. These comparisons do not isolate a causal education effect.
 
-![Median income by education](figures/fig4_median_by_education.png)
+![Median income by highest degree](figures/fig4_median_by_education.png)
 
-## One limitation
+## Limitations
 
-**The income variable is top-coded, so every inequality measure here is a lower bound.** Each survey
-year caps income at a single value that absorbs 7–11% of respondents; those observations are
-censored, not observed. Trimming the cap keeps the comparison honest across periods, but it also
-removes exactly the observations that would raise the Gini, the p90 and the SD of log income. The
-*direction* of the result does not depend on this choice — the trend survives with or without the
-trim — but the *magnitude* does, and the true level of inequality is higher than any figure reported
-here.
-
-Other caveats worth recording: these are repeated cross-sections rather than a panel, so decade
-differences mix real change with change in who was sampled; `realinc` is family income and is not
-equivalised for household size, which fell over the period and biases the comparison in an
-unquantified direction; 11.2% of GSS respondents have no valid income value and are excluded, which
-is unlikely to be missing at random; and the extract ends in 2016.
+- **Top-coding censors the upper tail.** Trimmed results describe only the retained sample; they are
+  not unbiased full-population inequality estimates. The sensitivity check supports the direction of
+  the trend, not the exact magnitude.
+- **Repeated cross-sections are not a panel.** The same households are not followed over time, and
+  changes in sample composition can contribute to differences between periods.
+- **Family income is not equivalised.** Household size is not available in this five-variable
+  extract, so the analysis does not adjust for differences in household needs.
+- **Validity filters may not be random.** The extract retains 88.6% of upstream rows after all
+  filters. If exclusion is related to income, the estimates may be biased.
+- **No causal or design-based uncertainty claims.** Education is a grouping variable, and the extract
+  does not contain the strata/PSU variables required for full survey-design standard errors.
+- **The period ends in 2016.** The results do not describe later income changes.
 
 ## Repository contents
 
-```
+```text
 data-science-project/
-├── income_analysis.ipynb        # the analysis, with outputs and figures
-├── figures/                     # the four figures, regenerated by the notebook
+├── income_analysis.ipynb        # analysis, outputs, validation checks and figures
+├── figures/                     # four PNG files regenerated by the notebook
 ├── data/
-│   ├── gss_income.csv           # the extract analysed here
-│   └── README.md                # provenance, construction, reuse terms
-├── requirements.txt
+│   ├── gss_income.csv           # the analysed extract
+│   └── README.md                # provenance, construction and reuse notes
+├── requirements.txt             # exact tested package versions
+├── LICENSE                      # MIT licence for the original code and text
 └── README.md
 ```
 
-| Figure | What it shows |
-|---|---|
-| `fig1_income_cdf_1970s_vs_2010s.png` | Cumulative distribution of income, first period vs last, on a log axis |
-| `fig2_income_quantiles_by_decade.png` | Weighted quantiles by decade: the fan opens |
-| `fig3_inequality_by_decade.png` | Gini and SD of log income by decade |
-| `fig4_median_by_education.png` | Median income by degree level: a widening gap |
+## Reproduce the analysis
 
-## How to run it
-
-The repository is self-contained — the data file is committed, so no download step is required.
+The repository is self-contained; no separate data download is required.
 
 ```bash
-git clone <this-repository-url>
+git clone https://github.com/wangtingyue0322-beep/data-science-project.git
 cd data-science-project
-
 python -m venv .venv
-source .venv/bin/activate          # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
+```
 
+Activate the environment:
+
+```bash
+# macOS / Linux
+source .venv/bin/activate
+
+# Windows PowerShell
+.venv\Scripts\Activate.ps1
+```
+
+Then install the tested dependencies and open the notebook:
+
+```bash
+python -m pip install -r requirements.txt
 jupyter lab income_analysis.ipynb
 ```
 
-Then run all cells (`Run` → `Run All Cells`). The four figures are written to `figures/` and the
-terminal output reproduces every number quoted above. Full execution takes about 20 seconds.
+Choose **Run → Run All Cells**. The notebook checks the input schema and values, recomputes every
+quoted statistic, and rewrites all four figures under `figures/`.
 
-Tested with Python 3.13.13, pandas 3.0.3, NumPy 2.3.5 and Matplotlib 3.11.0. Earlier versions of all
-three work; no deprecated pandas APIs are used.
+**Tested environment:** Python 3.13.13, pandas 3.0.3, NumPy 2.3.5, Matplotlib 3.11.0 and
+JupyterLab 4.5.8. Exact package versions are recorded in `requirements.txt`.
 
-## Status
+## Status and next step
 
-Completed. Next step: extend the same framework to equivalised household income and to the
-post-2016 waves, which would address the two limitations above.
+**Completed and reproducible.** A future extension could add household size, survey-design variables
+and later GSS waves to address several limitations without changing the core workflow.
 
 ## Author and licence
 
-Analysis and text by **Wang Tingyue (WANGTINGYUE)**. Code released under the MIT licence; the
-underlying GSS data remain subject to NORC's terms of use (see `data/README.md`).
+Analysis and text by **Wang Tingyue (WANGTINGYUE)**. Original code and text are released under the
+MIT licence; see [`LICENSE`](LICENSE). The underlying GSS data remain subject to NORC's terms and
+citation requirements; see [`data/README.md`](data/README.md).
