@@ -1,0 +1,5 @@
+Python: 3.13.13
+pandas: 3.0.3
+NumPy: 2.3.5
+Matplotlib: 3.11.0
+Command: jupyter lab income_analysis.ipynb -> Run All Cells

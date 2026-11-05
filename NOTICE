@@ -1,0 +1,14 @@
+NOTICE — data and code licence boundary
+
+The MIT licence in LICENSE applies to the original Python code, notebook text,
+documentation and generated figure source written by Wang Tingyue.
+
+The file data/gss_income.csv is a reduced extract derived from the General
+Social Survey (GSS), a public-use dataset distributed by NORC at the University
+of Chicago. It is NOT licensed under MIT. It is included solely to make this
+course analysis reproducible and remains subject to NORC's data-use terms and
+citation requirements. See data/README.md for provenance, construction and
+reuse notes.
+
+The CSV and generated results contain no passwords, API keys, credentials,
+direct personal identifiers or restricted GSS variables.

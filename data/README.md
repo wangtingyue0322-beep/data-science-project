@@ -65,12 +65,24 @@ Recommended source citation:
 
 ## Properties that affect interpretation
 
-- **Top-coding.** The open-ended upper bracket is assigned a single value. The analysis marks
-  observations at their survey year's maximum and reports both trimmed and untrimmed sensitivity
-  results. Neither approach reveals the unobserved incomes within the top bracket.
+- **Top-coding.** The open-ended upper bracket is assigned a year-specific single value. The
+  analysis marks observations at their survey year's maximum and compares four transparent
+  specifications: trimmed, ceiling as recorded, ceiling × 1.5 and ceiling × 2. These bounded
+  scenarios test the direction of the result; none reveals the unobserved incomes within the top
+  bracket.
 - **Family income is not equivalised.** Household size is absent, so comparisons do not adjust for
   household needs or changes in household composition.
 - **Selection may be non-random.** If the combined validity exclusions are related to income, the
   analytical sample may not represent the full target population.
 - **No survey-design variance variables.** Strata and PSU fields are not included, so the project
   reports descriptive estimates rather than design-based confidence intervals.
+
+## Generated validation outputs
+
+Running all notebook cells writes `results/data_quality.csv` with one row per survey year and
+records sample size, top-coded count and share, recorded ceiling, unweighted p75 and median, and
+minimum income. The notebook asserts that all 31 years have a top-code cluster of at least 20
+observations and that each annual ceiling lies above that year's unweighted p75. It also writes
+`results/summary_statistics.csv`, `results/education_summary.csv`,
+`results/topcode_sensitivity.csv` and `results/environment.txt`; `scripts/validate_results.py`
+checks these files without third-party packages.
